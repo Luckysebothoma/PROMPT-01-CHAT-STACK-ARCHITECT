@@ -1,0 +1,64 @@
+{
+  "title": "AI Gateway 1 of 10 - Chat Foundation",
+  "uid": "ai-gateway-1-of-10-chat",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "panels": [
+    {
+      "id": 1,
+      "title": "HTTP Request Rate",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "sum(rate(ai_gateway_http_requests_total[5m])) by (route)" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "HTTP Error Rate",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "sum(rate(ai_gateway_http_requests_total{status=~\"5..\"}[5m]))" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "HTTP Request Latency (p95)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum(rate(ai_gateway_http_request_duration_seconds_bucket[5m])) by (le))" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "AI Request Rate",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "sum(rate(ai_gateway_ai_requests_total[5m])) by (provider, status)" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Token Consumption",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "sum(rate(ai_gateway_input_tokens_total[5m])) by (provider)", "legendFormat": "input {{provider}}" },
+        { "expr": "sum(rate(ai_gateway_output_tokens_total[5m])) by (provider)", "legendFormat": "output {{provider}}" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Cache Hit Ratio",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        { "expr": "sum(rate(ai_gateway_cache_hits_total[5m])) / (sum(rate(ai_gateway_cache_hits_total[5m])) + sum(rate(ai_gateway_cache_misses_total[5m])))" }
+      ]
+    }
+  ]
+}
