@@ -19,6 +19,11 @@ done
 ROOT_DIR="$(cd -P "$(dirname "$SCRIPT_SOURCE")" >/dev/null 2>&1 && pwd)"
 cd "$ROOT_DIR" || exit 1
 
+# --- DAY2-PROVIDER-HOOK (PROMPT-02) ---
+if [ -f "$ROOT_DIR/scripts/day2-provider.sh" ]; then
+  . "$ROOT_DIR/scripts/day2-provider.sh"
+fi
+
 APP_NAME_DEFAULT="ai-gateway-1-of-10-chat"
 IMAGE_NAME_DEFAULT="ai-gateway-1-of-10-chat"
 
@@ -1455,6 +1460,14 @@ cmd_init() {
   validate_network
   inspect_postgres
   inspect_redis
+  if declare -f validate_provider_config >/dev/null; then validate_provider_config; fi
+  if declare -f dependency_matrix >/dev/null; then dependency_matrix; fi
+  if declare -f validate_provider_config >/dev/null; then validate_provider_config; fi
+  if declare -f dependency_matrix >/dev/null; then dependency_matrix; fi
+  if declare -f validate_provider_config >/dev/null; then validate_provider_config; fi
+  if declare -f dependency_matrix >/dev/null; then dependency_matrix; fi
+  if declare -f validate_provider_config >/dev/null; then validate_provider_config; fi
+  if declare -f dependency_matrix >/dev/null; then dependency_matrix; fi
 
   echo ""
   if [ "$CHECK_FAILED" = "0" ]; then
@@ -1662,7 +1675,16 @@ cmd_test() {
     log_skip "tests/smoke_test.sh not found or not executable"
   fi
 
-  log_step "TEST: secret / leak scan"
+  if declare -f dependency_matrix >/dev/null; then dependency_matrix; fi
+  if declare -f test_provider_day2 >/dev/null; then
+    if test_provider_day2; then overall_pass=$((overall_pass+1)); else overall_fail=$((overall_fail+1)); fi
+  fi
+
+  if declare -f scan_secrets_day2 >/dev/null; then
+    if scan_secrets_day2; then overall_pass=$((overall_pass+1)); else overall_fail=$((overall_fail+1)); fi
+  fi
+
+  log_step "TEST: secret / leak scan (legacy pattern scan)"
   local pattern='API_KEY|SECRET|PASSWORD|TOKEN|AUTHORIZATION|PRIVATE_KEY'
   local hits
   hits=$(grep -RInE "$pattern" "$ROOT_DIR" \

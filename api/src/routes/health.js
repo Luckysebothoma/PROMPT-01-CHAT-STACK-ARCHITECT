@@ -2,6 +2,9 @@ import { Hono } from "hono";
 import { env } from "../lib/env.js";
 import { checkPostgres } from "../lib/db.js";
 import { checkRedis } from "../lib/redisClient.js";
+import { providerHealthMap } from "../providers/provider.registry.js";
+import { listModels } from "../providers/model.registry.js";
+import { providerEnv } from "../lib/providerEnv.js";
 
 export const healthRoutes = new Hono();
 
@@ -32,7 +35,9 @@ healthRoutes.get("/dependencies", async (c) => {
   const redis = await checkRedis();
   return c.json({
     service: env.APP_NAME,
+    test_location: "container",
     dependencies: { postgres: pg, redis: redis },
+    ai_providers: providerHealthMap(),
   });
 });
 
@@ -59,6 +64,10 @@ healthRoutes.get("/help", (c) => {
       metadata: "optional object",
     },
     supported_operations: ["chat"],
-    notes: "This is iteration 1 of 10. Real AI provider routing is not implemented yet.",
+    default_provider: providerEnv.DEFAULT_PROVIDER || null,
+    default_model: providerEnv.DEFAULT_MODEL || null,
+    providers: providerHealthMap(),
+    models: listModels(),
+    notes: "Iteration 2: provider abstraction + model registry. Streaming, aliases, agents not implemented.",
   });
 });

@@ -22,10 +22,17 @@ services:
       REDIS_PORT: ${REDIS_PORT:-6379}
       REDIS_DATABASE: ${REDIS_DATABASE:-0}
       PROMETHEUS_ENABLED: ${PROMETHEUS_ENABLED:-true}
+      AI_DEFAULT_PROVIDER: ${AI_DEFAULT_PROVIDER:-}
+      AI_DEFAULT_MODEL: ${AI_DEFAULT_MODEL:-}
+      AI_REQUEST_TIMEOUT_MS: ${AI_REQUEST_TIMEOUT_MS:-30000}
+      GROQ_ENABLED: ${GROQ_ENABLED:-false}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_BASE_URL: ${GROQ_BASE_URL:-https://api.groq.com/openai/v1}
+      GROQ_MODELS: ${GROQ_MODELS:-}
     ports:
       - "${API_PORT:-4400}:${API_PORT:-4400}"
     networks:
-      - ai_gateway_external
+      - ai-gateway-net
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:' + (process.env.API_PORT || 4400) + '/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
       interval: ${HEALTHCHECK_INTERVAL:-10s}
@@ -33,6 +40,5 @@ services:
       retries: ${HEALTHCHECK_RETRIES:-5}
 
 networks:
-  ai_gateway_external:
-    name: ${SHARED_DOCKER_NETWORK:-ai-gateway-net}
+  ai-gateway-net:
     external: true

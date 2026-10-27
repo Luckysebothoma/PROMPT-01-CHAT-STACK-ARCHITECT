@@ -87,3 +87,39 @@ Postgres/Redis instance assumption. No horizontal scaling guidance yet.
 ## Next Iteration
 
 ADDING THE REAL AI PROVIDER ADAPTER / MODEL ROUTING FOUNDATION
+
+---
+
+## Iteration: PROMPT-02 — Provider Abstraction + Model Registry
+
+### Implemented
+- Provider adapter interface (`chat` / `health` / `metadata`) + bounded error type.
+- Groq adapter (OpenAI-compatible chat completions, fetch, timeout, no SDK).
+- Provider registry, model registry (operator-declared models, categories), resolver.
+- Deterministic resolution order with controlled failures; no fabricated responses.
+- Migration `002_provider_model_registry.sql`: `providers`, `models`,
+  `model_aliases` (structure only), `ai_usage_v2` (nullable token usage). No secrets stored.
+- `/dependencies` and `/help` report provider status (config-only, no live call, no secrets).
+- Provider metrics + extended existing Grafana dashboard.
+- Deployment script hooked for provider validation, dependency matrix, provider tests,
+  improved secret scan. Commands unchanged: init build push deploy ps logs test help.
+
+### Tests
+- Unit: provider registry, model registry, resolution, unknown provider, unknown model,
+  missing configuration, secret non-leakage (`node --test tests/`).
+- API: `/dependencies` provider status, invalid provider, invalid model, validation,
+  default resolution, metrics presence (`tests/provider_test.sh`).
+
+### Skipped / NOT AVAILABLE
+- Live cloud provider chat is reported NOT AVAILABLE unless a real key is configured
+  and the request actually executed.
+- Container dependency probes are skipped when the API container is not running.
+
+### Known limitations
+- Only Groq has an adapter; Gemini is configuration placeholder only.
+- Model aliases: tables exist, resolution not implemented.
+- No streaming, tools, JSON mode, caching of AI responses, token estimation.
+- Registry is env-driven at runtime; DB rows are for persistence/inspection.
+
+### Next iteration
+PROMPT-03 — Agent Registry + Agent Resolution (not implemented here).

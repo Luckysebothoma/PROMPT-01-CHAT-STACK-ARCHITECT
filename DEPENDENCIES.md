@@ -21,3 +21,14 @@
 ## Explicitly NOT required to start this stack
 
 Cloudflare, Firebase, Groq, Gemini, OpenAI, Anthropic, Lovable, Make, n8n.
+
+## Dependency test location (Day 2)
+
+Host reachability and container reachability are different facts. Each probe
+reports `TEST LOCATION`, `TARGET`, `DNS`, `TCP`. Docker service names such as
+`opentts-ai-postgres-db` normally resolve only inside the Docker network, so a
+host FAIL together with a container PASS is expected and is not an error.
+Docker service names are never replaced with hardcoded IP addresses.
+
+AI providers are checked with a configuration-only probe (enabled + key
+present). No live AI call is made from `/dependencies`.
